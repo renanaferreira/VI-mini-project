@@ -52,7 +52,373 @@
         }
     </style>
     <script type="text/javascript">
-        function draw(json_data) {
+        function draw() {
+
+            let json_data = {
+    "areas": {
+        "area01": "educação,artes e humanidades",
+        "area02": "ciências sociais, comércio e direito",
+        "area03": "ciências, matemática e informática",
+        "area04": "engenharia, indústrias transformadoras e construção",
+        "area05": "agricultura",
+        "area06": "saúde e protecção social",
+        "area07": "serviços"
+    },
+    "data": [
+        {
+            "ano": "1991",
+            "total": 186780,
+            "area01": 19471,
+            "area02": 19721,
+            "area03": 69850,
+            "area04": 17774,
+            "area05": 35438,
+            "area06": 6995,
+            "area07": 11992
+        },
+        {
+            "ano": "1992",
+            "total": 218317,
+            "area01": 21877,
+            "area02": 22061,
+            "area03": 85423,
+            "area04": 19961,
+            "area05": 40308,
+            "area06": 7735,
+            "area07": 14750
+        },
+        {
+            "ano": "1993",
+            "total": 246082,
+            "area01": 24556,
+            "area02": 24057,
+            "area03": 97123,
+            "area04": 22722,
+            "area05": 45231,
+            "area06": 8654,
+            "area07": 16693
+        },
+        {
+            "ano": "1994",
+            "total": 269982,
+            "area01": 27066,
+            "area02": 24838,
+            "area03": 109156,
+            "area04": 24600,
+            "area05": 49730,
+            "area06": 8852,
+            "area07": 18189
+        },
+        {
+            "ano": "1995",
+            "total": 290348,
+            "area01": 28188,
+            "area02": 26074,
+            "area03": 118818,
+            "area04": 26669,
+            "area05": 54710,
+            "area06": 8385,
+            "area07": 19407
+        },
+        {
+            "ano": "1996",
+            "total": 313415,
+            "area01": 30339,
+            "area02": 28604,
+            "area03": 125439,
+            "area04": 28571,
+            "area05": 61378,
+            "area06": 9048,
+            "area07": 21345
+        },
+        {
+            "ano": "1997",
+            "total": 334125,
+            "area01": 32899,
+            "area02": 30959,
+            "area03": 131223,
+            "area04": 30323,
+            "area05": 66855,
+            "area06": 10027,
+            "area07": 22259
+        },
+        {
+            "ano": "1998",
+            "total": 347473,
+            "area01": 36761,
+            "area02": 31239,
+            "area03": 131385,
+            "area04": 31632,
+            "area05": 72518,
+            "area06": 9879,
+            "area07": 24000
+        },
+        {
+            "ano": "1999",
+            "total": 356790,
+            "area01": 39574,
+            "area02": 32025,
+            "area03": 129145,
+            "area04": 32508,
+            "area05": 76762,
+            "area06": 10770,
+            "area07": 25072
+        },
+        {
+            "ano": "2000",
+            "total": 373745,
+            "area01": 47129,
+            "area02": 32954,
+            "area03": 129508,
+            "area04": 32632,
+            "area05": 80164,
+            "area06": 10777,
+            "area07": 28501
+        },
+        {
+            "ano": "2001",
+            "total": 387703,
+            "area01": 51128,
+            "area02": 35016,
+            "area03": 127043,
+            "area04": 32872,
+            "area05": 83781,
+            "area06": 10634,
+            "area07": 34185
+        },
+        {
+            "ano": "2002",
+            "total": 396601,
+            "area01": 51224,
+            "area02": 34872,
+            "area03": 126471,
+            "area04": 32572,
+            "area05": 86903,
+            "area06": 9999,
+            "area07": 40137
+        },
+        {
+            "ano": "2003",
+            "total": 400831,
+            "area01": 47337,
+            "area02": 34256,
+            "area03": 126700,
+            "area04": 32188,
+            "area05": 89988,
+            "area06": 9259,
+            "area07": 45643
+        },
+        {
+            "ano": "2004",
+            "total": 395063,
+            "area01": 40060,
+            "area02": 33841,
+            "area03": 124073,
+            "area04": 31223,
+            "area05": 90547,
+            "area06": 8412,
+            "area07": 51036
+        },
+        {
+            "ano": "2005",
+            "total": 380937,
+            "area01": 32905,
+            "area02": 32716,
+            "area03": 119402,
+            "area04": 29225,
+            "area05": 87945,
+            "area06": 7776,
+            "area07": 55201
+        },
+        {
+            "ano": "2006",
+            "total": 367312,
+            "area01": 26253,
+            "area02": 31606,
+            "area03": 115697,
+            "area04": 26976,
+            "area05": 85097,
+            "area06": 7045,
+            "area07": 58714
+        },
+        {
+            "ano": "2007",
+            "total": 366729,
+            "area01": 21381,
+            "area02": 31086,
+            "area03": 117209,
+            "area04": 26940,
+            "area05": 86202,
+            "area06": 6939,
+            "area07": 60599
+        },
+        {
+            "ano": "2008",
+            "total": 376917,
+            "area01": 19361,
+            "area02": 32821,
+            "area03": 120405,
+            "area04": 28602,
+            "area05": 88020,
+            "area06": 7757,
+            "area07": 62389
+        },
+        {
+            "ano": "2009",
+            "total": 373002,
+            "area01": 18553,
+            "area02": 32170,
+            "area03": 119303,
+            "area04": 27633,
+            "area05": 86450,
+            "area06": 7082,
+            "area07": 62409
+        },
+        {
+            "ano": "2010",
+            "total": 383627,
+            "area01": 20750,
+            "area02": 34187,
+            "area03": 121926,
+            "area04": 28367,
+            "area05": 88644,
+            "area06": 7024,
+            "area07": 62528
+        },
+        {
+            "ano": "2011",
+            "total": 396268,
+            "area01": 22262,
+            "area02": 36789,
+            "area03": 126102,
+            "area04": 28962,
+            "area05": 89899,
+            "area06": 7240,
+            "area07": 63999
+        },
+        {
+            "ano": "2012",
+            "total": 390273,
+            "area01": 22374,
+            "area02": 37271,
+            "area03": 122015,
+            "area04": 28597,
+            "area05": 89388,
+            "area06": 7232,
+            "area07": 61963
+        },
+        {
+            "ano": "2013",
+            "total": 371000,
+            "area01": 19275,
+            "area02": 35846,
+            "area03": 115884,
+            "area04": 28576,
+            "area05": 85871,
+            "area06": 7043,
+            "area07": 57723
+        },
+        {
+            "ano": "2014",
+            "total": 362200,
+            "area01": 17208,
+            "area02": 35492,
+            "area03": 114619,
+            "area04": 28278,
+            "area05": 81577,
+            "area06": 6967,
+            "area07": 57194
+        },
+        {
+            "ano": "2015",
+            "total": 349658,
+            "area01": 15049,
+            "area02": 35375,
+            "area03": 112085,
+            "area04": 27132,
+            "area05": 76953,
+            "area06": 6810,
+            "area07": 55530
+        },
+        {
+            "ano": "2016",
+            "total": 356399,
+            "area01": 13969,
+            "area02": 36285,
+            "area03": 113800,
+            "area04": 28650,
+            "area05": 78390,
+            "area06": 7778,
+            "area07": 55406
+        },
+        {
+            "ano": "2017",
+            "total": 361943,
+            "area01": 13603,
+            "area02": 37558,
+            "area03": 115952,
+            "area04": 30207,
+            "area05": 78027,
+            "area06": 8047,
+            "area07": 56113
+        },
+        {
+            "ano": "2018",
+            "total": 372753,
+            "area01": 13084,
+            "area02": 38995,
+            "area03": 120748,
+            "area04": 32019,
+            "area05": 78830,
+            "area06": 8236,
+            "area07": 57518
+        },
+        {
+            "ano": "2019",
+            "total": 385247,
+            "area01": 12685,
+            "area02": 40346,
+            "area03": 126537,
+            "area04": 32866,
+            "area05": 81137,
+            "area06": 8422,
+            "area07": 58986
+        },
+        {
+            "ano": "2020",
+            "total": 396909,
+            "area01": 13051,
+            "area02": 41357,
+            "area03": 131397,
+            "area04": 34431,
+            "area05": 82298,
+            "area06": 8786,
+            "area07": 60712
+        },
+        {
+            "ano": "2021",
+            "total": 411995,
+            "area01": 13781,
+            "area02": 42069,
+            "area03": 138283,
+            "area04": 35607,
+            "area05": 84262,
+            "area06": 9055,
+            "area07": 62748
+        },
+        {
+            "ano": "2022",
+            "total": 433217,
+            "area01": 15229,
+            "area02": 44419,
+            "area03": 145360,
+            "area04": 38221,
+            "area05": 87975,
+            "area06": 9600,
+            "area07": 66092
+        }
+    ]
+}
 
             let margin = 75,
                 width = 1400,
@@ -123,6 +489,30 @@
                     .attr("transform", "translate("+margin+"," + 0 + ")")
                     .call(y_axis);
 
+                // TODO title
+                svg.append("text")
+                .attr("text-anchor", "middle")
+                .attr("x", margin + (width - margin)/2)
+                .attr("y", margin - 10)
+                .text(areas[selected] + ". numero de estudantes ao longo dos anos.");
+
+                // X label
+            svg.append("text")
+                .attr("class", "x label")
+                .attr("text-anchor", "end")
+                .attr("x", margin + width/2)
+                .attr("y", height)
+                .text("Ano");
+            
+            // TODO x label
+            svg.append("text")
+                .attr("class", "y label")
+                .attr("text-anchor", "middle")
+                .attr("x", margin + (height - margin)/2)
+                .attr("y", 0)
+                .attr("transform", "rotate(90)")
+                .text("N. de alunos");
+
                 let rect = svg.selectAll("rect")
                     .data(dados)
                     .enter().append("rect")
@@ -158,12 +548,16 @@
     </script>
 </head>
 <body>
+    <div>
+        <a href="page01.html">Page 01</a>
+    <a href="page02.html">Page 02</a>
+    <a href="page03.html">Page 03</a>
+
+    </div>
     <select id="area_selection"></select>
     <div class="div_d3"> </div> 
     <script type="text/javascript">
-        d3.json("PORDATA_por-area-educacao.json")
-            .then(draw)
-            .catch(err => { console.log(err) });
+        draw();
     </script>
 </body>
 </html>
