@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://d3js.org/d3.v6.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <style>
+        .svg-tooltip {
+            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple   Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+            background: rgba(69,77,93,.9);
+            border-radius: .1rem;
+            color: #fff;
+            display: block;
+            font-size: 15px;
+            max-width: 360px;
+            padding: .2rem .4rem;
+            position: absolute;
+            text-overflow: ellipsis;
+            white-space: pre;
+            z-index: 300;
+            visibility: hidden;
+        }
+        .circle {
+            fill: red;
+        }
+        .bar {
+            fill: steelblue;
+        }
+        .axis path{
+            fill:none;
+            stroke: black;
+        }
+        .axis {
+            font-size:8pt;
+            font-family:sans-serif;
+        }
+        .tick {
+            fill:none;
+            stroke:black;
+        }
+        circle{
+            stroke:black;
+            stroke-width:0.5px;
+            fill:RoyalBlue;
+            opacity:0.6;
+        }
+
+        path {
+            fill:none;
+            stroke:black;
+            stroke-width:2px;
+        } 
+        path.linha_alunos{
+            stroke:DeepPink;
+        }
+    </style>
+    <script type="text/javascript">
+        function draw(json_data) {
+
+            let color = d3.scaleOrdinal(['#4daf4a','#377eb8','#ff7f00','#984ea3','#e41a1c','#4daf4a','#377eb8','#ff7f00']);
+
+            let margin = 75,
+                width = 1400,
+                height = 800;
+            
+            let areas = json_data["areas"];
+            let dataset = json_data["data"];
+            let anos = [];
+            for(var i = 0; i < dataset.length; i++) {
+                anos.push(dataset[i]["ano"]);
+            }
+            
+            let body = d3.select("body");
+
+            let selection = body.select("#ano_selection");          
+            selection.append("option").attr("value","").text("Choose an option");
+            for(var ano in anos) {
+                selection.append("option").attr("value", anos[ano]).text(anos[ano]);
+            }
+
+            let divD3 = body.select(".div_d3");
+
+            let setGraph = function(ano) {
+                divD3.select("svg").remove();
+                divD3.selectAll(".svg-tooltip").remove();
+
+                if (ano == "") {
+                    return;
+                }
+
+                /* Preprocess the data */
+                var dados = null;
+                for(var i = 0; i < dataset.length; i++) {
+                    if (dataset[i].ano == ano) {
+                        dados = Object.assign({}, dataset[i]);
+                        var total = dados.total;
+                        var undefinedArea = total;
+                        var tmp = [];
+                        var porcentagem;
+                        for(var area in areas) {
+                            var value = dados[area]
+                            undefinedArea -= value;
+                            porcentagem = Math.round(100*(value/total));
+                            tmp.push({"label": areas[area], "alunos": value, "porcentagem": porcentagem});
+                        }
+                        porcentagem = Math.round(100*(undefinedArea/total));
+                        tmp.push({"label": "alunos sem área definida", "alunos": undefinedArea, "porcentagem": porcentagem});
+                        dados = tmp;
+                        break;
+                    }
+                }
+
+                /*Create tooltips*/
+                var tooltips = [];
+                for(var index in dados) {
+                    var data = dados[index]
+                    var tooltip = divD3.append("div")
+                        .attr("class", "svg-tooltip")
+                        .style("position", "absolute")
+                        .style("visibility", "hidden");
+                    tooltip.append("span").text(data.label);
+                    tooltip.append("br");
+                    tooltip.append("span").text("Total: " + data.alunos);
+                    tooltips.push(tooltip);
+                }
+
+                /* Create SVG structure*/
+                let svg = divD3.append("svg")
+                    .attr("width", width)
+                    .attr("height", height);
+
+                radius = Math.min(width, height) / 2.5;
+                g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+                var pie = d3.pie().value(d => d.alunos);
+
+                // Generate the arcs
+                var arc = d3.arc()
+                    .innerRadius(0)
+                    .outerRadius(radius - 10);
+
+                //Generate groups
+                var arcs = g.selectAll("arc")
+                    .data(pie(dados))
+                    .enter()
+                    .append("g")
+                    .attr("class", "arc")
+                    .on("mouseover", function(e,d) {
+                        var index = dados.findIndex(elem => elem.label == d.data.label);
+                        var tooltip = tooltips[index];
+                        tooltip.style("visibility", "visible");
+                    })
+                    .on("mousemove", function(e,d) {
+                        var x = e.clientX, y = e.clientY;
+                        var index = dados.findIndex(elem => elem.label == d.data.label);
+                        var tooltip = tooltips[index];
+                        tooltip.style("top", (y+20) + "px");
+                        tooltip.style("left", (x+20) + "px");
+                    })
+                    .on("mouseout", function(e,d) {
+                        var index = dados.findIndex(elem => elem.label == d.data.label);
+                        var tooltip = tooltips[index];
+                        tooltip.style("visibility", "hidden");
+                    })
+
+                //Draw arc paths
+                arcs.append("path")
+                    .style("fill", function(d, i) {
+                        return color(i);
+                    })
+                    .attr("d", arc);
+                
+                var scale = 1.8;
+                arcs.append("text")
+                    .attr("transform", function(d) {
+                        return "translate("+ arc.centroid(d).map(d => d*scale) +")";
+                    })
+                    .text(function(d) {
+                        return d.data.porcentagem + "%";
+                    })
+                    .attr("text-anchor", "middle");
+
+                
+                
+            };
+
+            selection.on("change", function(e,d) {
+                let selection = e.path[0];
+                var value = selection.options[selection.selectedIndex].value;
+                setGraph(value);
+            });
+
+        };
+    </script>
+</head>
+<body>
+    <select id="ano_selection"></select>
+    <div class="div_d3"> </div> 
+    <script type="text/javascript">
+        d3.json("PORDATA_por-area-educacao.json")
+            .then(draw)
+            .catch(err => { console.log(err) });
+    </script>
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</body>
+</html>

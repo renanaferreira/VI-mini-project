@@ -20,6 +20,9 @@
             z-index: 300;
             visibility: hidden;
         }
+        .circle {
+            fill: red;
+        }
         .bar {
             fill: steelblue;
         }
@@ -63,7 +66,7 @@
             
             let body = d3.select("body");
 
-            let selection = body.select("#area_selection");            
+            let selection = body.select("#area_selection");          
             selection.append("option").text("Choose an option");
             for(var area in areas) {
                 selection.append("option").attr("value", area).text(areas[area]);
@@ -71,18 +74,29 @@
 
             let divD3 = body.select(".div_d3");
 
-            let setGraph = function(e) {
+            let setGraph = function(selection) {
                 divD3.select("svg").remove();
-                let selection = e.path[0];
-                if (selection.selectedIndex == 0) {
+                let index = selection.selectedIndex;
+
+                if (index == 0) {
                     return;
                 }
-                let selected = selection.options[selection.selectedIndex].value;
-                var dados = []
-                for(var i = 0; i < dataset.length; i++) {
+
+                let area = selection.options[index].value;
+
+                /* Preprocess the data */
+                var dados = [];
+                for(var i = 1; i < dataset.length; i++) {
                     let row = dataset[i];
-                    dados.push({"ano": row["ano"], "alunos": row[selected]});
+                    let year_before = dataset[i-1];
+                    var taxa = Math.round(100*((row[area]/year_before[area]) - 1));
+                    if (taxa == -0)
+                    {
+                        taxa = 0;
+                    }
+                    dados.push({"ano": row["ano"], "taxa": taxa});
                 }
+
                 /*Create tooltips*/
                 var tooltips = [];
                 for(var idx in dados) {
@@ -93,28 +107,21 @@
                         .style("visibility", "hidden");
                     tooltip.append("span").text(data.ano);
                     tooltip.append("br");
-                    tooltip.append("span").text(data.alunos);
+                    tooltip.append("span").text(data.taxa + "%");
                     tooltips.push(tooltip);
                 }
-
+                
+                /* Create SVG structure*/
                 let svg = divD3.append("svg")
                     .attr("width", width)
                     .attr("height", height);
 
-                let x_scale = d3.scaleBand().padding(0.4);
-                x_scale.range([margin, width - margin]);
-                x_scale.domain(dados.map( d => d.ano ));
-
-                let x_axis = d3.axisBottom(x_scale);
-
-                svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + (height - margin) + ")")
-                    .call(x_axis);
-
+                let extentY = d3.extent(dados.map(d => d.taxa));
+                let limitY = Math.max(Math.abs(extentY[0]), Math.abs(extentY[1]));
                 let y_scale = d3.scaleLinear();
                 y_scale.range([height - margin, margin]);
-                y_scale.domain([0, d3.max(dados, d => d.alunos)]);
+                y_scale.domain([-limitY, limitY]);
+                y_scale.nice();
 
                 let y_axis = d3.axisLeft(y_scale);
 
@@ -123,35 +130,63 @@
                     .attr("transform", "translate("+margin+"," + 0 + ")")
                     .call(y_axis);
 
-                let rect = svg.selectAll("rect")
-                    .data(dados)
-                    .enter().append("rect")
-                    .attr("class", "bar")
-                        .attr("x", function(d) { return x_scale(d.ano); } )
-                        .attr("y", function(d) { return y_scale(d.alunos);})
-                        .attr("width", function(d) {return x_scale.bandwidth();})
-                        .attr("height", function(d) {return height - margin - y_scale(d.alunos);})
-                    .on("mouseover", function(e,d) {
+
+                let x_scale = d3.scaleBand();
+                x_scale.range([margin, width - margin]);
+                x_scale.domain(dados.map( d => d.ano ));
+
+                let x_axis = d3.axisBottom(x_scale);
+
+                let xAxisPosition = y_scale(0);
+                svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + xAxisPosition + ")")
+                    .call(x_axis);
+
+                let circ = svg.selectAll("circle")
+                .data(dados)
+                .enter().append("circle")
+                .attr("class", "circle")
+                .attr("cx", d => x_scale(d.ano) + x_scale.bandwidth()/2)
+                .attr("cy", function(d) { 
+                        if (d.taxa >= 0) {
+                            return y_scale(Math.max(0, d.taxa));
+                        } else {
+                            return y_scale(Math.max(0, d.taxa)) + Math.abs(y_scale(d.taxa) - y_scale(0));
+                        }
+                })
+                .attr("r", 5)
+                .on("mouseover", function(e,d) {
                         var index = dados.findIndex(elem => elem.ano == d.ano);
                         var tooltip = tooltips[index];
                         tooltip.style("visibility", "visible");
-                    })
-                    .on("mousemove", function(e,d) {
+                })
+                .on("mousemove", function(e,d) {
                         var x = e.clientX, y = e.clientY;
                         var index = dados.findIndex(elem => elem.ano == d.ano);
                         var tooltip = tooltips[index];
                         tooltip.style("top", (y+20) + "px");
                         tooltip.style("left", (x+20) + "px");
-                    })
-                    .on("mouseout", function(e,d) {
+                })
+                .on("mouseout", function(e,d) {
                         var index = dados.findIndex(elem => elem.ano == d.ano);
                         var tooltip = tooltips[index];
                         tooltip.style("visibility", "hidden");
-                    });
+                });
+                
+                let line = d3.line()
+                .x(d => x_scale(d.ano))
+                .y(d => y_scale(d.taxa));
+
+                let xpos = x_scale.bandwidth()/2;
+                svg.append("path")
+                .attr("d", line(dados))
+                .attr("transform", "translate("+xpos+",0)");
+                
             };
 
             selection.on("change", function(e,d) {
-                setGraph(e);
+                setGraph(e.path[0]);
             });
 
         };
